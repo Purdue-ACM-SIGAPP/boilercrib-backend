@@ -25,7 +25,8 @@ db.building.insertMany([
   {"_id":ObjectId("67b53552cb4412c68729fd35"),"name":"Wiley Hall","acronym":"WILY","address":"500 North Martin Jischke Drive, West Lafayette, IN 47906","buildingType":"Housing","latitude":40.42948,"longitude":-86.920743},
   {"_id":ObjectId("67b7d208fc18b9daaaee6fbb"),"name":"Owen Hall","acronym":"OWEN","address":"Owen Hall, Purdue University, West Lafayette, IN 47907","buildingType":"Housing","latitude":40.432288,"longitude":-86.920743},
   {"_id":ObjectId("67b7d278fc18b9daaaee6fbc"),"name":"Harrison Hall","acronym":"HARR","address":"Harrison Hall, Purdue University, West Lafayette, IN 47907","buildingType":"Housing","latitude":40.425068,"longitude":-86.926822},
-  {"_id":ObjectId("67b7d445fc18b9daaaee6fbd"),"name":"McCutcheon Hall","acronym":"MCUT","address":"McCutcheon Hall, Purdue University, West Lafayette, IN 47907","buildingType":"Housing","latitude":40.425068,"longitude":-86.92804}
+  {"_id":ObjectId("67b7d445fc18b9daaaee6fbd"),"name":"McCutcheon Hall","acronym":"MCUT","address":"McCutcheon Hall, Purdue University, West Lafayette, IN 47907","buildingType":"Housing","latitude":40.425068,"longitude":-86.92804},
+  {"_id":ObjectId("b3bfe5042cdbd04fbd025b0f"),"name":"South Hall","acronym":"SH","address":"201 North MacArthur Drive, West Lafayette, IN 47906","buildingType":"Housing","latitude":40.426366,"longitude":-86.925769}
 ]);
 
 const daysFromNow = (days, hour) => {
