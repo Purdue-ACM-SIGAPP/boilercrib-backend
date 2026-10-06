@@ -1,5 +1,6 @@
 using dotenv.net;
 using SimpleWebAppReact.Services;
+using Scalar.AspNetCore; // Added for the modern API UI
 
 // Load .env into environment variables before configuration is built,
 // so entries like ConnectionStrings__DbConnection override appsettings.json
@@ -10,7 +11,7 @@ const string CorsPolicy = "AllowAll";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Built-in .NET OpenAPI document generation package
 builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
@@ -26,17 +27,23 @@ builder.Services.AddHttpClient<GoogleMapsService>();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    // Exposes the OpenAPI v1 spec at: /openapi/v1.json
+    app.MapOpenApi();
+
+    // Renders the modern, interactive document UI at: /scalar
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("My API v1")
+               .WithTheme(ScalarTheme.DeepSpace); // Optional: Customize your theme
+    });
+}
+else
 {
     app.UseHsts();
     app.UseHttpsRedirection();
-
-    // Set up Swagger UI to see documentation of all routes and controllers in this app
-    app.MapOpenApi();
-    app.UseSwaggerUI(options => {
-        // Point Swagger to the OpenAPI spec
-        options.SwaggerEndpoint("/openapi/v1.json", "My API v1");
-    });
 }
 
 app.UseRouting();
