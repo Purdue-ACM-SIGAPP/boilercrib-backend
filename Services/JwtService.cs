@@ -11,7 +11,7 @@ namespace SimpleWebAppReact.Services;
 public class JwtService
 {
     private const string Issuer = "boilercrib";
-    private const string Audience = "boilercrip-app";
+    private const string Audience = "boilercrib-app";
     private const string RoleClaim = "role";
     private const int MinimumKeyBytes = 64;
     private static readonly TimeSpan TokenLifetime = TimeSpan.FromDays(7);
