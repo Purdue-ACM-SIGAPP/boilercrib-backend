@@ -113,6 +113,13 @@ public class ReviewController : ControllerBase
         await SortByDate(_reviews.Find(r => r.BuildingId == buildingId), mostRecent: true).ToListAsync();
 
     /// <summary>
+    /// gets all reviews written by a user, most recent first
+    /// </summary>
+    [HttpGet("user/{userId}")]
+    public async Task<IEnumerable<Review>> GetByUserId(string userId) =>
+        await SortByDate(_reviews.Find(r => r.UserId == userId), mostRecent: true).ToListAsync();
+
+    /// <summary>
     /// deletes all reviews of a building
     /// </summary>
     [HttpDelete("building/{buildingId}")]
