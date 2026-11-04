@@ -26,6 +26,12 @@ public class Room
     [BsonElement("capacityRangeEnd"), BsonRepresentation(BsonType.Int32)]
     public int CapacityRangeEnd { get; set; }
 
+    /// <summary>
+    /// Category of the room, e.g. "1 BR Apt," "Traditional"
+    /// </summary>
+    [BsonElement("category"), BsonRepresentation(BsonType.String)]
+    public string? Category { get; set; }
+
     [BsonElement("features")]
     public List<string> Features { get; set; } = new List<string>();
 
