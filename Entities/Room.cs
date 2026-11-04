@@ -36,7 +36,7 @@ public class Room
     public List<string> Features { get; set; } = new List<string>();
 
     /// <summary>
-    /// Cost per period (specified in the `Period` field)
+    /// Cost per period (period specified in the `Period` field)
     /// </summary>
     [BsonElement("housingRate"), BsonRepresentation(BsonType.Double)]
     public double HousingRate { get; set; }
