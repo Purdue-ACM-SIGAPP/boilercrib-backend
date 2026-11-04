@@ -35,10 +35,18 @@ public class Room
     [BsonElement("features")]
     public List<string> Features { get; set; } = new List<string>();
 
-    [BsonElement("cost"), BsonRepresentation(BsonType.Decimal128)]
-    public decimal Cost { get; set; }
+    /// <summary>
+    /// Cost per period (specified in the `Period` field)
+    /// </summary>
+    [BsonElement("housingRate"), BsonRepresentation(BsonType.Double)]
+    public double HousingRate { get; set; }
 
-    public double HousingRate {get; set; }
+    /// <summary>
+    /// Period of the cost, e.g. "Academic Year," "Month"
+    /// </summary>
+    [BsonElement("period"), BsonRepresentation(BsonType.String)]
+    public string? Period { get; set; }
+
 
     public bool IsSharedBathroom {get; set; }
 
