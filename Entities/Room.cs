@@ -50,6 +50,8 @@ public class Room
     [BsonElement("isSharedBathroom"), BsonRepresentation(BsonType.Boolean)]
     public bool IsSharedBathroom { get; set; }
 
+    [BsonElement("isAirConditioned"), BsonRepresentation(BsonType.Boolean)]
+    public bool IsAirConditioned { get; set; }
 
     [BsonElement("buildingId"), BsonRepresentation(BsonType.ObjectId)]
 
