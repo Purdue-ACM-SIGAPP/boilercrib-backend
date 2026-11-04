@@ -1,4 +1,6 @@
+using System.Threading.RateLimiting;
 using dotenv.net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SimpleWebAppReact.Services;
 using Scalar.AspNetCore; // Added for the modern API UI
 
@@ -25,6 +27,19 @@ builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddHttpClient<BuildingOutlineService>();
 builder.Services.AddHttpClient<GoogleMapsService>();
 builder.Services.AddSingleton<PasswordHasherService>();
+builder.Services.AddSingleton<JwtService>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<JwtService>((options, jwtService) => options.TokenValidationParameters = jwtService.ValidationParameters);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("auth", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? string.Empty,
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1) }));
+});
 
 var app = builder.Build();
 
@@ -49,6 +64,9 @@ else
 
 app.UseRouting();
 app.UseCors(CorsPolicy);
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

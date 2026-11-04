@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -45,13 +46,14 @@ public class ReviewController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Review>> GetById(string id)
     {
-        var review = MongoDbService.IsValidId(id) ? await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync() : null;
+        var review = await FindAsync(id);
         return review is null ? NotFound() : Ok(review);
     }
 
     /// <summary>
     /// adds review entry to table
     /// </summary>
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult> Post(Review review)
     {
@@ -61,6 +63,7 @@ public class ReviewController : ControllerBase
         }
 
         review.Id = null;
+        review.UserId = User.GetUserId();
         review.CreatedAt = DateTime.UtcNow;
         review.LikeCount ??= 0;
         review.DislikeCount ??= 0;
@@ -73,6 +76,7 @@ public class ReviewController : ControllerBase
     /// <summary>
     /// updates a review entry
     /// </summary>
+    [Authorize]
     [HttpPut]
     public async Task<ActionResult> Update(Review review)
     {
@@ -81,28 +85,42 @@ public class ReviewController : ControllerBase
             return BadRequest(RatingError);
         }
 
-        if (!MongoDbService.IsValidId(review.Id))
+        var existing = await FindAsync(review.Id);
+        if (existing is null)
         {
             return NotFound();
         }
 
-        var result = await _reviews.ReplaceOneAsync(r => r.Id == review.Id, review);
-        return result.MatchedCount > 0 ? Ok() : NotFound();
+        if (!User.IsOwnerOrAdmin(existing.UserId))
+        {
+            return Forbid();
+        }
+
+        var update = Builders<Review>.Update.Set(r => r.Description, review.Description).Set(r => r.Rating, review.Rating);
+        await _reviews.UpdateOneAsync(r => r.Id == review.Id, update);
+        return Ok();
     }
 
     /// <summary>
     /// deletes a review entry
     /// </summary>
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(string id)
     {
-        if (!MongoDbService.IsValidId(id))
+        var existing = await FindAsync(id);
+        if (existing is null)
         {
             return NotFound();
         }
 
-        var result = await _reviews.DeleteOneAsync(r => r.Id == id);
-        return result.DeletedCount > 0 ? Ok() : NotFound();
+        if (!User.IsOwnerOrAdmin(existing.UserId))
+        {
+            return Forbid();
+        }
+
+        await _reviews.DeleteOneAsync(r => r.Id == id);
+        return Ok();
     }
 
     /// <summary>
@@ -115,6 +133,7 @@ public class ReviewController : ControllerBase
     /// <summary>
     /// deletes all reviews of a building
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpDelete("building/{buildingId}")]
     public async Task<ActionResult> DeleteByBuildingId(string buildingId)
     {
@@ -136,6 +155,7 @@ public class ReviewController : ControllerBase
     /// <summary>
     /// marks a review as flagged
     /// </summary>
+    [Authorize]
     [HttpPost("flag")]
     public async Task<ActionResult> FlagReview([FromQuery] string id)
     {
@@ -147,6 +167,9 @@ public class ReviewController : ControllerBase
         var result = await _reviews.UpdateOneAsync(r => r.Id == id, Builders<Review>.Update.Set(r => r.Flagged, true));
         return result.MatchedCount > 0 ? Ok() : NotFound();
     }
+
+    private async Task<Review?> FindAsync(string? id) =>
+        MongoDbService.IsValidId(id) ? await _reviews.Find(r => r.Id == id).FirstOrDefaultAsync() : null;
 
     private static bool IsValidRating(int? rating) => rating >= Review.MIN_RATING && rating <= Review.MAX_RATING;
 

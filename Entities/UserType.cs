@@ -4,6 +4,6 @@ namespace SimpleWebAppReact.Entities;
 /// </summary>
 public enum UserType
 {
-  Student,
-  Admin
+  Student = 0,
+  Admin = 4
 }

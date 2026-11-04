@@ -37,14 +37,4 @@ public class PasswordHasherService
             return false;
         }
     }
-
-    /// <summary>
-    /// Checks if a given password is plaintext. Will be used for converting current users to hashed passwords.
-    /// </summary>
-    /// <param name="password"></param>
-    /// <returns></returns>
-    public bool IsPlaintext(string password)
-    {
-        return password.StartsWith("AQAAAA") && password.EndsWith("==");
-    }
 }
