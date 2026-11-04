@@ -47,8 +47,9 @@ public class Room
     [BsonElement("period"), BsonRepresentation(BsonType.String)]
     public string? Period { get; set; }
 
+    [BsonElement("isSharedBathroom"), BsonRepresentation(BsonType.Boolean)]
+    public bool IsSharedBathroom { get; set; }
 
-    public bool IsSharedBathroom {get; set; }
 
     [BsonElement("buildingId"), BsonRepresentation(BsonType.ObjectId)]
 
