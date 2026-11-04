@@ -2,8 +2,29 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 public class Room
 {
-    [BsonElement("capacity"), BsonRepresentation(BsonType.Int32)]
-    public int Capacity { get; set; }
+    /// <summary>
+    /// Room capacity:
+    /// <code>
+    /// English       | CapacityRangeStart | CapacityRangeEnd
+    /// --------------+--------------------+-----------------
+    /// 2 to 4 people |                  2 |                4
+    /// 2 people      |                  2 |                2
+    /// </code>
+    /// </summary>
+    [BsonElement("capacityRangeStart"), BsonRepresentation(BsonType.Int32)]
+    public int CapacityRangeStart { get; set; }
+
+    /// <summary>
+    /// Room capacity:
+    /// <code>
+    /// English       | CapacityRangeStart | CapacityRangeEnd
+    /// --------------+--------------------+-----------------
+    /// 2 to 4 people |                  2 |                4
+    /// 2 people      |                  2 |                2
+    /// </code>
+    /// </summary>
+    [BsonElement("capacityRangeEnd"), BsonRepresentation(BsonType.Int32)]
+    public int CapacityRangeEnd { get; set; }
 
     [BsonElement("features")]
     public List<string> Features { get; set; } = new List<string>();
