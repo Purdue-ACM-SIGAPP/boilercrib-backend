@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SimpleWebAppReact.Entities;
@@ -58,12 +59,14 @@ public class EventsController : ControllerBase
     }
 
     /// <summary>
-    /// adds an event; the author is the user id sent with the request
+    /// adds an event
     /// </summary>
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult> Post(Events evt)
     {
         evt.Id = null;
+        evt.UserID = User.GetUserId();
         await _events.InsertOneAsync(evt);
         return CreatedAtAction(nameof(GetById), new { id = evt.Id }, evt);
     }
@@ -71,6 +74,7 @@ public class EventsController : ControllerBase
     /// <summary>
     /// updates an event, keeping its original author
     /// </summary>
+    [Authorize]
     [HttpPut]
     public async Task<ActionResult> Update(Events evt)
     {
@@ -78,6 +82,11 @@ public class EventsController : ControllerBase
         if (existing is null)
         {
             return NotFound();
+        }
+
+        if (!User.IsOwnerOrAdmin(existing.UserID))
+        {
+            return Forbid();
         }
 
         evt.UserID = existing.UserID;
@@ -88,6 +97,7 @@ public class EventsController : ControllerBase
     /// <summary>
     /// deletes an event
     /// </summary>
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(string id)
     {
@@ -95,6 +105,11 @@ public class EventsController : ControllerBase
         if (existing is null)
         {
             return NotFound();
+        }
+
+        if (!User.IsOwnerOrAdmin(existing.UserID))
+        {
+            return Forbid();
         }
 
         await _events.DeleteOneAsync(e => e.Id == id);

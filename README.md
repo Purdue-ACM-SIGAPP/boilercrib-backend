@@ -14,19 +14,20 @@ Run these from this folder:
 
 ```
 docker compose up -d   # start MongoDB on localhost:27017 (seeded on first start)
+cp .env.example .env   # then set JWT_KEY in .env
 dotnet restore
 dotnet run             # API on http://localhost:5128
 ```
 
-To check that it works, open http://localhost:5128/swagger.
+To check that it works, open http://localhost:5128/scalar.
 
 Leave `dotnet run` running while you use the frontend. Press Ctrl-C to stop the API. To stop
 MongoDB, run `docker compose down`.
 
-## Configuration (optional)
+## Configuration
 
-You don't need a `.env` for local development. The Development settings already point at the
-Docker MongoDB. To override a setting, copy the example file:
+The only required setting is `JWT_KEY`. The Development settings already point at the Docker
+MongoDB. Copy the example file and set `JWT_KEY`:
 
 ```
 cp .env.example .env
@@ -34,6 +35,8 @@ cp .env.example .env
 
 Values in `.env` override `appsettings.json`:
 
+- `JWT_KEY`: required. Signing key for login tokens, at least 64 characters, for example the
+  output of `openssl rand -base64 64`.
 - `ConnectionStrings__DbConnection`: MongoDB connection string (default `mongodb://localhost:27017`)
 - `ConnectionStrings__DatabaseName`: database name (default `test`)
 - `GoogleMaps__ApiKey`: used only by the geocoding and distance endpoints. Leave it blank if you
@@ -52,10 +55,23 @@ To reseed, delete the volume and start again:
 docker compose down -v && docker compose up -d
 ```
 
-## Notes
+## Authentication
 
-The API is open: there is no JWT validation yet. `POST api/User` creates an account from a
-username and password. To find its id, call `GET api/User?username=<name>`.
+`POST api/User` (sign up) and `POST api/User/login` return `{ token, user }`. Send the token as
+`Authorization: Bearer <token>` on requests that change data or read accounts. Reading
+buildings, reviews and events needs no token.
+
+Users can change only their own account, reviews and events. Admins (`accountType` 4) can change
+any of them, manage buildings, and list users. To make the first admin, set it in MongoDB:
+
+```
+db.user.updateOne({ username: "<name>" }, { $set: { accountType: 4 } })
+```
+
+Accounts created before passwords were hashed get a 403 from login until they choose a new
+password with `POST api/User/reset-password` and `{ username, password, newPassword }`.
+
+Sign-up, login and password reset are limited to 10 requests per minute per IP address.
 
 ## Troubleshooting
 

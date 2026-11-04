@@ -1,4 +1,5 @@
 using FuzzySharp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace SimpleWebAppReact.Controllers;
 public class BuildingController : ControllerBase
 {
     private enum FilterMatch { AtLeast, Equal, Contains }
+
+    private const int MaxImageBytes = 5 * 1024 * 1024;
 
     // Filterable fields, keyed by criteria name (case-insensitive), and the building type they apply to
     private static readonly Dictionary<string, (string Type, string Field, FilterMatch Match)> FilterFields =
@@ -92,6 +95,7 @@ public class BuildingController : ControllerBase
     /// <summary>
     /// adds building entry to table, geocoding its address when coordinates are missing
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpPost]
     public async Task<ActionResult> Post(Building building)
     {
@@ -116,6 +120,7 @@ public class BuildingController : ControllerBase
     /// <summary>
     /// updates a building entry
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpPut]
     public async Task<ActionResult> Update(Building building)
     {
@@ -131,6 +136,7 @@ public class BuildingController : ControllerBase
     /// <summary>
     /// deletes a building entry
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(string id)
     {
@@ -216,14 +222,11 @@ public class BuildingController : ControllerBase
     /// <summary>
     /// sets a building's image from an uploaded file, stored as base64
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpPost("uploadImage/{id}")]
+    [RequestSizeLimit(MaxImageBytes)]
     public async Task<ActionResult> UploadImage(string id, IFormFile file)
     {
-        if (file.Length == 0)
-        {
-            return BadRequest();
-        }
-
         if (!MongoDbService.IsValidId(id))
         {
             return NotFound();
@@ -231,12 +234,21 @@ public class BuildingController : ControllerBase
 
         using var stream = new MemoryStream();
         await file.CopyToAsync(stream);
-        var update = Builders<Building>.Update.Set(b => b.Image, Convert.ToBase64String(stream.ToArray()));
+        var image = stream.ToArray();
+        if (!IsJpegOrPng(image))
+        {
+            return BadRequest("Upload a JPEG or PNG image.");
+        }
 
+        var update = Builders<Building>.Update.Set(b => b.Image, Convert.ToBase64String(image));
         var result = await _buildings.UpdateOneAsync(b => b.Id == id, update);
         return result.MatchedCount > 0 ? Ok() : NotFound();
     }
 
     private async Task<Building?> FindAsync(string? id) =>
         MongoDbService.IsValidId(id) ? await _buildings.Find(b => b.Id == id).FirstOrDefaultAsync() : null;
+
+    private static bool IsJpegOrPng(byte[] bytes) =>
+        bytes.AsSpan().StartsWith(new byte[] { 0xFF, 0xD8, 0xFF })
+        || bytes.AsSpan().StartsWith(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
 }

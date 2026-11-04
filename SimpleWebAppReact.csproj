@@ -12,6 +12,7 @@
     <!-- Utilities -->
     <PackageReference Include="dotenv.net" Version="4.2.0" />
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     
     <!-- Database -->

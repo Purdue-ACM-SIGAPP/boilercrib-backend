@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using SimpleWebAppReact.Entities;
@@ -77,6 +78,7 @@ public class MapsController : ControllerBase
     /// <summary>
     /// sets a building's coordinates by geocoding its address
     /// </summary>
+    [Authorize(Roles = nameof(UserType.Admin))]
     [HttpPost("set-coordinates")]
     public async Task<IActionResult> SetCoordinates(string buildingId)
     {
