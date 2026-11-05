@@ -32,7 +32,7 @@ public class Room
     [BsonElement("category"), BsonRepresentation(BsonType.String)]
     public string? Category { get; set; }
 
-    [BsonElement("features")]
+    [BsonElement("features"), BsonRepresentation(BsonType.Array)]
     public List<string> Features { get; set; } = new List<string>();
 
     /// <summary>
