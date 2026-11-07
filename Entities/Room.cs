@@ -27,6 +27,13 @@ public class Room
     public int CapacityRangeEnd { get; set; }
 
     /// <summary>
+    /// What the capacity is for, e.g. per "Room," or per "Bedroom"
+    /// Useful in the case of multiple rooms or bedrooms
+    /// </summary>
+    [BsonElement("capacityPer"), BsonRepresentation(BsonType.String)]
+    public string? CapacityPer { get; set; }
+
+    /// <summary>
     /// Category of the room, e.g. "1 BR Apt," "Traditional"
     /// </summary>
     [BsonElement("category"), BsonRepresentation(BsonType.String)]
