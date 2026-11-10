@@ -34,10 +34,10 @@ public class Room
     public string? CapacityPer { get; set; }
 
     /// <summary>
-    /// Category of the room, e.g. "1 BR Apt," "Traditional"
+    /// Type of room, e.g. "Triple w/shrd bath," "2 Rm Suite for 4 priv bth," "Double"
     /// </summary>
-    [BsonElement("category"), BsonRepresentation(BsonType.String)]
-    public string? Category { get; set; }
+    [BsonElement("roomType"), BsonRepresentation(BsonType.String)]
+    public string? RoomType { get; set; }
 
     [BsonElement("features"), BsonRepresentation(BsonType.Array)]
     public List<string> Features { get; set; } = new List<string>();
