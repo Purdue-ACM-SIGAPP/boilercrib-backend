@@ -12,6 +12,24 @@ public class Housing : Building
     [BsonElement("rooms")]
     public List<Room> Rooms { get; set; } = new List<Room>();
 
+    [BsonElement("description"), BsonRepresentation(BsonType.String)]
+    public string? Description { get; set; }
+
+    [BsonElement("contactPhone"), BsonRepresentation(BsonType.String)]
+    public string? ContactPhone { get; set; }
+
+    [BsonElement("contactEmail"), BsonRepresentation(BsonType.String)]
+    public string? ContactEmail { get; set; }
+
+    [BsonElement("contactWebsite"), BsonRepresentation(BsonType.String)]
+    public string? ContactWebsite { get; set; }
+
+    [BsonElement("photos")]
+    public List<string> Photos { get; set; } = new List<string>();
+
+    [BsonElement("floorPlans")]
+    public List<string> FloorPlans { get; set; } = new List<string>();
+
     [BsonElement("pianoNum"), BsonRepresentation(BsonType.Int32)]
     public int PianoNum { get; set; }
 
@@ -26,5 +44,4 @@ public class Housing : Building
 
     [BsonElement("studySpaceNum"), BsonRepresentation(BsonType.Int32)]
     public int StudySpaceNum { get; set; }
-    
 }
