@@ -34,6 +34,8 @@ public class BuildingController : ControllerBase
 
     private readonly ILogger<BuildingController> _logger;
     private readonly IMongoCollection<Building> _buildings;
+    private readonly IMongoCollection<Housing> _housing;
+    private readonly IMongoCollection<Review> _reviews;
     private readonly BuildingOutlineService _outlineService;
     private readonly GoogleMapsService _mapsService;
 
@@ -42,6 +44,8 @@ public class BuildingController : ControllerBase
     {
         _logger = logger;
         _buildings = mongoDbService.Database.GetCollection<Building>("building");
+        _housing = mongoDbService.Database.GetCollection<Housing>("building");
+        _reviews = mongoDbService.Database.GetCollection<Review>("review");
         _outlineService = outlineService;
         _mapsService = mapsService;
     }
@@ -87,6 +91,66 @@ public class BuildingController : ControllerBase
     {
         var building = await FindAsync(id);
         return building is null ? NotFound() : Ok(building);
+    }
+
+    /// <summary>
+    /// Gets a complete, client-ready housing overview for a housing building.
+    /// Existing building endpoints remain unchanged for compatibility.
+    /// </summary>
+    [HttpGet("{id}/housing")]
+    public async Task<ActionResult<HousingDetailResponse>> GetHousingDetails(string id)
+    {
+        if (!MongoDbService.IsValidId(id))
+        {
+            return NotFound();
+        }
+
+        var housing = await _housing.Find(b => b.Id == id).FirstOrDefaultAsync();
+        if (housing is null || !string.Equals(housing.BuildingType, "Housing", StringComparison.OrdinalIgnoreCase))
+        {
+            return NotFound();
+        }
+
+        var reviews = await _reviews
+            .Find(r => r.BuildingId == id)
+            .SortByDescending(r => r.CreatedAt)
+            .ToListAsync();
+
+        var roomOptions = housing.Rooms ?? new List<Room>();
+        var availableListings = roomOptions
+            .Where(room => room.AvailableUnits > 0)
+            .ToList();
+
+        var response = new HousingDetailResponse
+        {
+            Id = housing.Id,
+            Name = housing.Name,
+            Acronym = housing.Acronym,
+            Address = housing.Address,
+            Latitude = housing.Latitude,
+            Longitude = housing.Longitude,
+            Image = housing.Image,
+            BuildingType = housing.BuildingType,
+            Description = housing.Description,
+            Contact = new HousingContact
+            {
+                Phone = housing.ContactPhone,
+                Email = housing.ContactEmail,
+                Website = housing.ContactWebsite,
+            },
+            Pricing = roomOptions.Select(room => room.Cost).Where(cost => cost > 0).ToList(),
+            RoomOptions = roomOptions,
+            AvailableListings = availableListings,
+            FloorPlans = housing.FloorPlans,
+            Photos = housing.Photos,
+            Reviews = reviews,
+            RoomCount = roomOptions.Count,
+            AveragePrice = roomOptions.Count == 0
+                ? null
+                : roomOptions.Where(room => room.Cost > 0).Select(room => room.Cost).Average(),
+        };
+
+        return Ok(response);
     }
 
     /// <summary>
