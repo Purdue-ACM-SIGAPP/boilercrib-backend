@@ -47,3 +47,25 @@ db.events.insertMany([
   { eventName: "Late Night Study Session", summary: "Sample event: snacks and quiet study space during finals week.", content: "Sample event created by the local seed script.", userID: "sample-user", date: daysFromNow(7, 1), address: "1275 First Street, West Lafayette, IN 47906" },
   { eventName: "Dining Court Tasting", summary: "Sample event: try new menu items and vote for favorites.", content: "Sample event created by the local seed script.", userID: "sample-user", date: daysFromNow(10, 17), address: "498 Jischke Drive, West Lafayette, IN 47906" },
 ]);
+
+// Sample students for the roommate finder. Log in as any of them with the password "password"
+// (passwordHashed is that password hashed by PasswordHasherService).
+const samplePasswordHash = "AQAAAAIAAYagAAAAEJa4HP4mmH0fM3LHXDw6xZJqRCrI2QFM7CITG6cECpsLEahbOse2+K8Nv5rmkvBr8A==";
+db.user.insertMany([
+  { _id: ObjectId("6740a0000000000000000001"), username: "jordan", passwordHashed: samplePasswordHash, name: "Jordan Lee", phoneNumber: "765-555-0101", accountType: 0 },
+  { _id: ObjectId("6740a0000000000000000002"), username: "sam", passwordHashed: samplePasswordHash, name: "Sam Patel", phoneNumber: "765-555-0102", accountType: 0 },
+  { _id: ObjectId("6740a0000000000000000003"), username: "riley", passwordHashed: samplePasswordHash, name: "Riley Chen", phoneNumber: "765-555-0103", accountType: 0 },
+  { _id: ObjectId("6740a0000000000000000004"), username: "alex", passwordHashed: samplePasswordHash, name: "Alex Morgan", phoneNumber: "765-555-0104", accountType: 0 },
+  { _id: ObjectId("6740a0000000000000000005"), username: "taylor", passwordHashed: samplePasswordHash, name: "Taylor Brooks", phoneNumber: "765-555-0105", accountType: 0 },
+]);
+
+// year is a ClassYear (0 = Freshman). Lifestyle answers are 1-5: sleepSchedule 1 = early bird,
+// cleanliness 5 = very tidy, noiseTolerance 1 = needs quiet, guestFrequency 1 = rarely has guests.
+// Budgets are dollars per semester. contactInfo is only shown after a roommate request is accepted.
+db.roommateBio.insertMany([
+  { userId: "6740a0000000000000000001", name: "Jordan Lee", gender: "Male", age: 18, year: 0, major: "Computer Science", bio: "Sample bio: up early for the gym and keeps the room tidy.", interests: ["gym", "coding", "basketball"], preferredBuildingIds: ["67a2bf3f41447d8654fec45e", "67ae9e4cb54f3608bced571c"], contactInfo: "jordan@example.com", createdAt: daysFromNow(-10, 15), term: "Fall 2027", budgetMin: 4000, budgetMax: 5500, sleepSchedule: 1, cleanliness: 5, noiseTolerance: 2, guestFrequency: 2, smoker: false, isLooking: true },
+  { userId: "6740a0000000000000000002", name: "Sam Patel", gender: "Male", age: 18, year: 0, major: "Mechanical Engineering", bio: "Sample bio: quiet weeknights, game nights on weekends.", interests: ["gym", "video games"], preferredBuildingIds: ["67a2bf3f41447d8654fec45e", "673400991a2d8e0fbcc020f5"], contactInfo: "sam@example.com", createdAt: daysFromNow(-8, 18), term: "Fall 2027", budgetMin: 4500, budgetMax: 6000, sleepSchedule: 2, cleanliness: 4, noiseTolerance: 2, guestFrequency: 3, smoker: false, isLooking: true },
+  { userId: "6740a0000000000000000003", name: "Riley Chen", gender: "Female", age: 19, year: 1, major: "Psychology", bio: "Sample bio: night owl who studies late and likes having friends over.", interests: ["music", "theater"], preferredBuildingIds: ["67b531fe7e2b227430be03a2", "67b534bccb4412c68729fd34"], contactInfo: "riley@example.com", createdAt: daysFromNow(-6, 21), term: "Fall 2027", budgetMin: 3000, budgetMax: 4200, sleepSchedule: 5, cleanliness: 2, noiseTolerance: 5, guestFrequency: 5, smoker: false, isLooking: true },
+  { userId: "6740a0000000000000000004", name: "Alex Morgan", gender: "Nonbinary", age: 18, year: 0, major: "Biology", bio: "Sample bio: honors student, flexible schedule, pretty easygoing.", interests: ["coding", "hiking"], preferredBuildingIds: ["67ae9e4cb54f3608bced571c", "67b531027e2b227430be03a1"], contactInfo: "alex@example.com", createdAt: daysFromNow(-3, 16), term: "Fall 2027", budgetMin: 5000, budgetMax: 6500, sleepSchedule: 3, cleanliness: 4, noiseTolerance: 3, guestFrequency: 2, smoker: false, isLooking: true },
+  { userId: "6740a0000000000000000005", name: "Taylor Brooks", gender: "Female", age: 20, year: 2, major: "Management", bio: "Sample bio: looking for a roommate for spring.", interests: ["running"], preferredBuildingIds: ["673401591a2d8e0fbcc020f9"], contactInfo: "taylor@example.com", createdAt: daysFromNow(-1, 14), term: "Spring 2027", budgetMin: 3500, budgetMax: 5000, sleepSchedule: 3, cleanliness: 3, noiseTolerance: 3, guestFrequency: 3, smoker: false, isLooking: true },
+]);

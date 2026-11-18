@@ -29,6 +29,12 @@ public class MongoDbService
             Builders<Review>.IndexKeys.Descending(r => r.CreatedAt)));
         Database.GetCollection<Events>("events").Indexes.CreateOne(new CreateIndexModel<Events>(
             Builders<Events>.IndexKeys.Ascending(e => e.Date)));
+        Database.GetCollection<RoommateBio>("roommateBio").Indexes.CreateOne(new CreateIndexModel<RoommateBio>(
+            Builders<RoommateBio>.IndexKeys.Ascending(b => b.UserId)));
+        Database.GetCollection<RoommateRequest>("roommateRequest").Indexes.CreateOne(new CreateIndexModel<RoommateRequest>(
+            Builders<RoommateRequest>.IndexKeys.Ascending(r => r.ToUserId).Ascending(r => r.Status)));
+        Database.GetCollection<RoommateRequest>("roommateRequest").Indexes.CreateOne(new CreateIndexModel<RoommateRequest>(
+            Builders<RoommateRequest>.IndexKeys.Ascending(r => r.FromUserId).Ascending(r => r.Status)));
     }
 
     public IMongoDatabase Database { get; }

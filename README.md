@@ -73,6 +73,23 @@ password with `POST api/User/reset-password` and `{ username, password, newPassw
 
 Sign-up, login and password reset are limited to 10 requests per minute per IP address.
 
+## Roommate finder
+
+- `api/Roommate`: roommate bios. Anyone can browse them (filters include `gender`, `year`,
+  `major`, `interest`, `buildingId`, `term` and `maxBudget`). Creating, editing and deleting a
+  bio needs a token, and users can change only their own. Bios include optional matching
+  answers: move-in term, budget, and sleep, cleanliness, noise and guest habits on a 1-5 scale.
+- `GET api/Roommate/matches`: other students who are still looking, ranked by a 0-100
+  compatibility score with the signed-in user. The weights live in `Services/RoommateMatcher.cs`.
+- `api/RoommateRequest`: send, accept, decline and cancel roommate requests as the signed-in
+  user. Accepting marks both bios as no longer looking.
+
+A bio's `contactInfo`, and the student's phone number, are hidden until a roommate request
+between the two students is accepted. The owner and admins always see them.
+
+The seed adds five sample students with roommate bios: `jordan`, `sam`, `riley`, `alex` and
+`taylor`, all with the password `password`. Existing databases need a reseed to get them.
+
 ## Troubleshooting
 
 - **`dotnet: command not found`**: the SDK isn't on your PATH. If it's installed in `~/.dotnet`,
